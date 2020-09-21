@@ -1,0 +1,20 @@
+[
+  {
+    "Title": "Go 的大数据",
+    "Author":  "毛剑",
+    "Company": "BILIBILI",
+    "BgPath":  "./data/img/poster.jpg",
+    "DstPath": "./data/gen/dst/mojian.jpg",
+    "MemberPath": "./data/img/maojian.jpeg",
+		"ThumbPath": "./data/gen/thumb/maojian.jpg"
+  },
+  {
+    "Title": "Go 语言在游戏项目的应用情况汇报",
+    "Author":  "毛剑",
+    "Company": "BILIBILI",
+    "BgPath":  "./data/img/poster.jpg",
+    "DstPath": "./data/gen/dst/mojian2.jpg",
+    "MemberPath": "./data/img/maojian.jpeg",
+		"ThumbPath": "./data/gen/thumb/maojian.jpg"
+  }
+]

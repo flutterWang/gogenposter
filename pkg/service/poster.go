@@ -1,12 +1,14 @@
 package service
 
 import (
-	"github.com/golang/freetype"
 	"image"
 	"image/draw"
 	"image/jpeg"
 	"io/ioutil"
 	"os"
+	"unicode/utf8"
+
+	"github.com/golang/freetype"
 )
 
 type Poster struct {
@@ -45,6 +47,10 @@ type DrawText struct {
 	X0    int
 	Y0    int
 	Size0 float64
+
+	TitleNext string
+	X3        int
+	Y3        int
 
 	Author string
 	X1     int
@@ -114,13 +120,13 @@ func (p *Poster) Generate() (err error) {
 	draw.Draw(jpg, jpg.Bounds(), avatarImage, avatarImage.Bounds().Min.Sub(image.Pt(p.Avatar.X, p.Avatar.Y)), draw.Over)
 	draw.Draw(jpg, jpg.Bounds(), qrImage, avatarImage.Bounds().Min.Sub(image.Pt(p.Qr.X, p.Qr.Y)), draw.Over)
 
-	err = p.DrawPoster(&DrawText{
+	drawText := &DrawText{
 		JPG: jpg,
 
 		Title: p.Title,
 		X0:    94,
 		Y0:    892,
-		Size0: 50,
+		Size0: 40,
 
 		Author: p.Author,
 		X1:     500,
@@ -131,13 +137,41 @@ func (p *Poster) Generate() (err error) {
 		X2:      500,
 		Y2:      948,
 		Size2:   35,
-	}, "msyhbd.ttc")
+	}
+
+	if utf8.RuneCountInString(p.Title) > 10 {
+		drawText.Title = substring(p.Title, 0, 10)
+		drawText.TitleNext = substring(p.Title, 10, utf8.RuneCountInString(p.Title))
+		drawText.X3 = 94
+		drawText.Y3 = 948
+	}
+
+	err = p.DrawPoster(drawText, "msyhbd.ttc")
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func substring(source string, start int, end int) string {
+	var r = []rune(source)
+	length := len(r)
+
+	if start < 0 || end > length || start > end {
+		return ""
+	}
+
+	if start == 0 && end == length {
+		return source
+	}
+
+	var substring = ""
+	for i := start; i < end; i++ {
+		substring += string(r[i])
+	}
+	return substring
 }
 
 func (p *Poster) DrawPoster(d *DrawText, fontName string) error {
@@ -160,6 +194,11 @@ func (p *Poster) DrawPoster(d *DrawText, fontName string) error {
 	fc.SetSrc(image.Black)
 
 	_, err = fc.DrawString(d.Title, freetype.Pt(d.X0, d.Y0))
+	if err != nil {
+		return err
+	}
+
+	_, err = fc.DrawString(d.TitleNext, freetype.Pt(d.X3, d.Y3))
 	if err != nil {
 		return err
 	}
